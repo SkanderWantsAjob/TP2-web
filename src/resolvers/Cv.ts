@@ -1,18 +1,22 @@
+import { Context, Cv as CvType } from "../types";
+
 export const Cv = {
-  skills: ({ id }: { id: string }, args: any, { db }: any) => {
-    let cvskill: string[];
-    let skillids: string[] = [];
-    cvskill = db.cv_skills.filter((cvskill: any) => cvskill.cv === id);
-    cvskill.forEach((skillid: any) => {
-      skillids.push(skillid.skill); 
+  skills: async ({ id }: CvType, _args: unknown, { prisma }: Context) => {
+    const skills = await prisma.cvSkill.findMany({
+      where: { cvId: id },
+      select: {
+        skillId: true,
+      },
     });
-    return db.skills.filter((skill: any) => skillids.includes(skill.id));
+    const skillIds = skills.map((skill) => skill.skillId);
+    const cvSkills = await prisma.skill.findMany({
+      where: { id: { in: skillIds } },
+    });
+    return cvSkills;
   },
 
-  user: ({ user }: { user: string }, args: any, { db }: any) => {
-    const userByCv = db.users.find((u: any) => u.id === user);
-    userByCv.role = userByCv.role === "admin" ? "ADMIN" : "USER"; 
-    return userByCv;
+  user: ({ userId }: CvType, _args: unknown, { prisma }: Context) => {
+    return prisma.user.findUnique({ where: { id: userId } });
   },
 };
 

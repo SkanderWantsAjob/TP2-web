@@ -8,7 +8,7 @@ import { context } from "./context";
 export const schema = createSchema({
   typeDefs: readFileSync(
     join(__dirname, "schema/schema.graphql"),
-    "utf-8"
+    "utf-8",
   ),
   resolvers: {
     Cv,
@@ -23,5 +23,5 @@ const yoga = createYoga({ schema, context });
 
 const server = createServer(yoga);
 server.listen(4000, () => {
-  console.info("Server is currently running on http://localhost:4000/graphql");
+  console.info("Server is running on http://localhost:4000/graphql");
 });

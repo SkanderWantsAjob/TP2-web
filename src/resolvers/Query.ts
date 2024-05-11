@@ -1,17 +1,24 @@
 import { GraphQLError } from "graphql";
+import { Context, Id } from "../types";
 
 export const Query = {
   hello: () => "Hello GL3",
-  getCvs: (parent: any, args: any, { db }: any, info: any) => {
-    return db.cvs;
+  getCvs: (_parent: unknown, _args: unknown, { prisma }: Context) => {
+    return prisma.cv.findMany();
   },
-  getCvById: (parent: any, { id }: {id:string}, { db }: any, info: any) => {
-    const cv = db.cvs.find((cv: any) => cv.id === id);
+  getCvById: async (
+    _parent: unknown,
+    { id }: Id,
+    { prisma }: Context,
+  ) => {
+    const cv = await prisma.cv.findUnique({ where: { id } });
+
     if (!cv) {
-      throw new GraphQLError(` the cv you demanded of the id ${id} does not exist `);
+      throw new GraphQLError(
+        ` the cv you demanded of the id ${id} does not exist `,
+      );
     }
+
     return cv;
   },
 };
-
-
